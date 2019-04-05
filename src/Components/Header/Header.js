@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
-import './Header.css';
+import React, { Component } from "react";
+import "./Header.css";
+import Axios from "axios";
 
 export default class Header extends Component {
   constructor() {
     super();
     this.state = {
-      username: '',
-      password: '',
-      isAdmin: false,
+      username: "",
+      password: "",
+      isAdmin: false
     };
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
@@ -28,15 +29,47 @@ export default class Header extends Component {
   }
 
   login() {
-    // axios POST to /auth/login here
+    const { password, username } = this.state;
+    Axios.post("/auth/login", { username, password })
+      .then(res => {
+        this.setState({
+          username: "",
+          password: "",
+          isAdmin: false
+        });
+        this.props.updateUser(res.data);
+      })
+      .catch(err => {
+        this.setState({ username: "", password: "" });
+        alert(err.response.request.response);
+      });
   }
 
   register() {
-    // axios POST to /auth/register here
+    const { password, username, isAdmin } = this.state;
+    Axios.post("/auth/register", { username, password, isAdmin })
+      .then(res => {
+        this.setState({
+          username: "",
+          password: "",
+          isAdmin: false
+        });
+        this.props.setUserToState(res.data);
+      })
+      .catch(err => {
+        this.setState({ username: "", password: "" });
+        alert(err.response.request.response);
+      });
   }
 
   logout() {
-    // axios GET to /auth/logout here
+    Axios.get("/auth/logout")
+      .then(() => {
+        this.props.setUserToState({});
+      })
+      .catch(err => {
+        console.log(err,"user not logged out");
+      });
   }
 
   render() {
@@ -67,7 +100,12 @@ export default class Header extends Component {
               onChange={e => this.handlePasswordInput(e.target.value)}
             />
             <div className="adminCheck">
-              <input type="checkbox" id="adminCheckbox" onChange={() => this.toggleAdmin()} /> <span> Admin </span>
+              <input
+                type="checkbox"
+                id="adminCheckbox"
+                onChange={() => this.toggleAdmin()}
+              />{" "}
+              <span> Admin </span>
             </div>
             <button onClick={this.login}>Log In</button>
             <button onClick={this.register} id="reg">
@@ -79,4 +117,3 @@ export default class Header extends Component {
     );
   }
 }
-

@@ -18,11 +18,19 @@ class App extends Component {
     });
   }
 
+  setUserToState = (newUser) => {
+    this.setState({
+      user: newUser
+    })
+  }
+
   render() {
+    console.log('app user state', this.state.user);
+    
     const { user } = this.state;
     return (
       <div className="App">
-        <Header user={user} updateUser={this.updateUser} />
+        <Header user={user} updateUser={this.updateUser} setUserToState={this.setUserToState} />
         <Container user={user} />
       </div>
     );
